@@ -114,7 +114,7 @@ def venues():
 
   for venue in venues:
 
-    #venue = dict(zip(('id', 'city', 'name'),(venue.id , venue.city , venue.city)))
+    
     data.append({
       "city" : venue.city ,
       "state" : venue.state ,
@@ -123,7 +123,9 @@ def venues():
         "name" : venue.name 
       }]
     })
+    ### to be deleted ##
     #response['data'].append(venue)
+    #venue = dict(zip(('id', 'city', 'name'),(venue.id , venue.city , venue.city)))
   '''
   data=[{
     "city": "San Francisco",
@@ -147,6 +149,7 @@ def venues():
     }]
   }]
   '''
+  ### to be deleted ##
   
   return render_template('pages/venues.html', areas=data);
 
@@ -155,33 +158,54 @@ def search_venues():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-  '''
-  search_str = request.form.get('search_term')
-	venue_query = Venue.query.filter(Venue.name.ilike('%{}%'.format(search_str)))
-	venue_list = list(map(Venue.short, venue_query)) 
-	response = {
-	"count":len(venue_list),
-	"data": venue_list
-	}
-	return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
-  '''
-  response={
-    "count": 1,
-    "data": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
+  search_term = request.form.get('search_term', '')
+  data = Venue.query.filter(Venue.name.ilike('%{}%'.format(search_term))).all()
+  count = []
+  for outcome in data:
+    count.append({
+      "id":outcome.id,
+      "name": outcome.name,
+      "num_upcoming_shows": len(db.session.query(Show).filter(Show.venue_id == outcome.id).filter(Show.start_time > datetime.now()).all())
+    })
+  response = {
+    "count":len(data),
+    "data": count
   }
+  
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  output=Venue.query.all()
-  array_length = len(output)
+  selected_venue=Venue.query.get(venue_id)
+  #array_length = len(output)
   
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
+  data = {
+    "id": selected_venue.id,
+    "name": selected_venue.name,
+    "genres": selected_venue.genres ,
+    "address": selected_venue.address,
+    "city": selected_venue.city,
+    "state": selected_venue.state,
+    "phone": selected_venue.phone,
+    "website": selected_venue.website,
+    "facebook_link": selected_venue.facebook_link,
+    "seeking_talent": True,
+    "seeking_description": selected_venue.seeking_description,
+    "image_link":selected_venue.image_link ,
+    "past_shows": [{
+      "artist_id": 4,
+      "artist_name": "Guns N Petals",
+      "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
+      "start_time": "2019-05-21T21:30:00.000Z"
+    }],
+    "upcoming_shows": [],
+    "past_shows_count": selected_venue.past_shows_count,
+    "upcoming_shows_count": 0
+  }
+
+   ### data1 is left as a reference till fix the issue with retrieving artist infos
   '''
   data1={
     "id": 1,
@@ -206,6 +230,9 @@ def show_venue(venue_id):
     "past_shows_count": 1,
     "upcoming_shows_count": 0,
   }
+  '''
+  ### to be deleted ##
+  '''
   data2={
     "id": 2,
     "name": "The Dueling Pianos Bar",
@@ -260,11 +287,11 @@ def show_venue(venue_id):
     "past_shows_count": 1,
     "upcoming_shows_count": 1,
   }
-  '''
-  for i in output:
+  
+ # for i in output:
 
-    data = list(filter(lambda d: d['id'] == venue_id, [i]))[0]
-
+    #data = list(filter(lambda d: d['id'] == venue_id, [i]))[0]
+'''
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -311,7 +338,7 @@ def create_venue_submission():
 def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-  '''
+  
   try:
     Show.query.filter(Show.venue_id==venue_id).delete()
     Venue.query.filter(Venue.id == venue_id).delete()
@@ -321,10 +348,13 @@ def delete_venue(venue_id):
   finally:
     db.session.close()
   return render_template('pages/home.html')
-'''
+
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+   #insert a button and send ajax call from main.html to this decorator
+
+   #partially working , redirecting is not working 
+  return render_template('pages/venues.html')
 
 #  Artists
 #  ----------------------------------------------------------------
