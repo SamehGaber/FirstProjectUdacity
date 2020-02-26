@@ -109,7 +109,22 @@ def venues():
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   # areas = Venue.query.order_by(Venue.city).all()
   
-  
+  data=[]
+  venues = Venue.query.all()
+
+  for venue in venues:
+
+    #venue = dict(zip(('id', 'city', 'name'),(venue.id , venue.city , venue.city)))
+    data.append({
+      "city" : venue.city ,
+      "state" : venue.state ,
+      "venues" : [{
+        "id" : venue.id,
+        "name" : venue.name 
+      }]
+    })
+    #response['data'].append(venue)
+  '''
   data=[{
     "city": "San Francisco",
     "state": "CA",
@@ -131,6 +146,7 @@ def venues():
       "num_upcoming_shows": 0,
     }]
   }]
+  '''
   
   return render_template('pages/venues.html', areas=data);
 
@@ -316,26 +332,16 @@ def delete_venue(venue_id):
 def artists():
   # TODO: replace with real data returned from querying the database
 
-  artists = Artist.query.all()
+  #artists = db.session.query(Artist.id , Artist.name).all()
   my_dict=[]
-  
+  artists = Artist.query.all()
+
   for artist in artists:
-   loop_in_artists ={'id ' :artist.id , 'name':artist.name}
-   my_dict.append(loop_in_artists)
-   '''
-   data=[{
-    "id": artist.id,
-    "name": artist.name,
-   }]
-   
-   , {
-    "id": 5,
-    "name": "Matt Quevedo",
-   }, {
-    "id": 6,
-    "name": "The Wild Sax Band",
-   }]'''
-   return render_template('pages/artists.html', artists=my_dict)
+      artist = dict(zip(('id', 'name'),(artist.id , artist.name)))
+      my_dict.append(artist)
+  
+    
+  return render_template('pages/artists.html', artists=my_dict)
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
