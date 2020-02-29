@@ -5,7 +5,7 @@
 <h3>{{ area.city }}, {{ area.state }}</h3>
 	<ul class="items">
 		{% for venue in area.venues %}
-		<button class="check_delete" data-id="{{venue.id}}" > &cross; </button>
+		<button class="check_delete" data-id="{{venue.id}}" style="position: absolute;"> &cross; </button>
 		<li>
 			<a href="/venues/{{ venue.id }}">
 				<i class="fas fa-music"></i>

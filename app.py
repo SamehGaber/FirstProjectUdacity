@@ -177,7 +177,31 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   selected_venue=Venue.query.get(venue_id)
-  #array_length = len(output)
+  past_shows =[]
+  upcoming_shows = []
+  shows=Show.query.filter_by(venue_id=venue_id).all()
+
+  for show in shows:
+
+    if show.start_time < str(datetime.now()):
+
+     past_shows.append({
+     #"venue_id": show.venue_id,
+     #"venue_name": Venue.query.filter_by(id=show.venue_id).first().name,
+     "artist_id": show.artist_id,
+     "artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
+     #"artist_image_link":Artist.query.filter_by(id=show.artist_id).first().image_link ,
+     "artist_image_link":Venue.query.filter_by(id=show.venue_id).first().image_link ,
+     "start_time": str(show.start_time) })
+    else:
+      upcoming_shows.append({
+      #"venue_id": show.venue_id,
+      #"venue_name": Venue.query.filter_by(id=show.venue_id).first().name,
+      "artist_id": show.artist_id,
+      "artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
+      #"artist_image_link":Artist.query.filter_by(id=show.artist_id).first().image_link ,
+      "artist_image_link":Venue.query.filter_by(id=show.venue_id).first().image_link ,
+      "start_time": show.start_time })
   
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
@@ -194,15 +218,10 @@ def show_venue(venue_id):
     "seeking_talent": True,
     "seeking_description": selected_venue.seeking_description,
     "image_link":selected_venue.image_link ,
-    "past_shows": [{
-      "artist_id": 4,
-      "artist_name": "Guns N Petals",
-      "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-      "start_time": "2019-05-21T21:30:00.000Z"
-    }],
-    "upcoming_shows": [],
-    "past_shows_count": selected_venue.past_shows_count,
-    "upcoming_shows_count": 0
+    "past_shows":past_shows,
+    "upcoming_shows": upcoming_shows,
+    "past_shows_count": len(past_shows),
+    "upcoming_shows_count": len(upcoming_shows)
   }
 
    ### data1 is left as a reference till fix the issue with retrieving artist infos
@@ -419,12 +438,6 @@ def show_artist(artist_id):
       "artist_image_link":Venue.query.filter_by(id=show.venue_id).first().image_link ,
       "start_time": show.start_time })
       
-
-
-
-
-
-
  
   data={
     "id": selected_artist.id,
@@ -440,8 +453,8 @@ def show_artist(artist_id):
     "image_link": selected_artist.image_link,
     "past_shows":past_shows,
     "upcoming_shows": upcoming_shows,
-    #"past_shows_count": selected_artist.past_shows_count,
-    "upcoming_shows_count": 0,
+    "past_shows_count": len(past_shows),
+    "upcoming_shows_count": len(upcoming_shows),
   }
 
 
