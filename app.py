@@ -393,6 +393,39 @@ def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
   selected_artist= Artist.query.get(artist_id)
+  past_shows =[]
+  upcoming_shows = []
+  shows=Show.query.filter_by(artist_id=artist_id).all()
+
+  for show in shows:
+
+    if show.start_time < str(datetime.now()):
+
+     past_shows.append({
+     "venue_id": show.venue_id,
+     "venue_name": Venue.query.filter_by(id=show.venue_id).first().name,
+     #"artist_id": show.artist_id,
+     #"artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
+     #"artist_image_link":Artist.query.filter_by(id=show.artist_id).first().image_link ,
+     "artist_image_link":Venue.query.filter_by(id=show.venue_id).first().image_link ,
+     "start_time": str(show.start_time) })
+    else:
+      upcoming_shows.append({
+      "venue_id": show.venue_id,
+      "venue_name": Venue.query.filter_by(id=show.venue_id).first().name,
+      #"artist_id": show.artist_id,
+      #"artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
+      #"artist_image_link":Artist.query.filter_by(id=show.artist_id).first().image_link ,
+      "artist_image_link":Venue.query.filter_by(id=show.venue_id).first().image_link ,
+      "start_time": show.start_time })
+      
+
+
+
+
+
+
+ 
   data={
     "id": selected_artist.id,
     "name": selected_artist.name,
@@ -405,13 +438,8 @@ def show_artist(artist_id):
     "seeking_venue": True,
     "seeking_description": selected_artist.seeking_description,
     "image_link": selected_artist.image_link,
-    "past_shows": [{
-      "venue_id": 1,
-      "venue_name": "The Musical Hop",
-      "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-      "start_time": "2019-05-21T21:30:00.000Z"
-    }],
-    "upcoming_shows": [],
+    "past_shows":past_shows,
+    "upcoming_shows": upcoming_shows,
     #"past_shows_count": selected_artist.past_shows_count,
     "upcoming_shows_count": 0,
   }
@@ -516,6 +544,7 @@ def edit_artist(artist_id):
 
   # TODO: populate form with fields from artist with ID <artist_id>
   selected_artist= Artist.query.get(artist_id)
+  
   artist={
     "id": selected_artist.id,
     "name": selected_artist.name,
@@ -529,8 +558,8 @@ def edit_artist(artist_id):
     "seeking_description": selected_artist.seeking_description,
     "image_link": selected_artist.image_link,
     "past_shows": [{
-      "venue_id": 1,
-      "venue_name": "The Musical Hop",
+      "venue_id": "dummy",
+      "venue_name": "dummy",
       "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
       "start_time": "2019-05-21T21:30:00.000Z"
     }],
@@ -579,6 +608,7 @@ def edit_artist_submission(artist_id):
 def edit_venue(venue_id):
   form = VenueForm()
   selected_venue= Venue.query.get(venue_id)
+  #shows = Show.query.filter_by(venue_id=venue_id).all()
   artist={
     "id": selected_venue.id,
     "name": selected_venue.name,
@@ -697,6 +727,21 @@ def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
+
+  data=[]
+  shows = Show.query.all()
+
+  for show in shows:
+
+    
+    data.append({
+    "venue_id": show.venue_id,
+    "venue_name": Venue.query.filter_by(id=show.venue_id).first().name,
+    "artist_id": show.artist_id,
+    "artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
+    "artist_image_link":Artist.query.filter_by(id=show.artist_id).first().image_link ,
+    "start_time": show.start_time })
+  '''
   data=[{
     "venue_id": 1,
     "venue_name": "The Musical Hop",
@@ -733,6 +778,7 @@ def shows():
     "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
     "start_time": "2035-04-15T20:00:00.000Z"
   }]
+  '''
   return render_template('pages/shows.html', shows=data)
 
 @app.route('/shows/create')
@@ -765,6 +811,9 @@ def create_show_submission():
   finally:
      db.session.close()
      return render_template('pages/home.html')
+
+
+
 
 
 
@@ -801,3 +850,15 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 '''
+
+
+'''
+     [
+      {
+      "venue_id": 1,
+      "venue_name": "The Musical Hop",
+      "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
+      "start_time": "2019-05-21T21:30:00.000Z"
+    }
+    ]
+    '''
